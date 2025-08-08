@@ -4,8 +4,8 @@ import { toast } from "sonner"
 
 const UploadPortal = () => {
     const urlParams = new URLSearchParams(window.location.search);
-    const name = urlParams.get('name') || 'Sahil';
-    const phone = urlParams.get('phone') || '917018763780';
+    const name = urlParams.get('name') || 'Akbar';
+    const phone = urlParams.get('phone') || '919670867797';
     const API_HOST = import.meta.env.VITE_API_HOST;
     const handleFileSubmit = async (files: File[]) => {
       const formData = new FormData();

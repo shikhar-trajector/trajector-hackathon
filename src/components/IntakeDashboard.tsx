@@ -10,6 +10,9 @@ interface Client {
   id: number;
   name: string;
   mobile: string;
+  email: string;
+  status: string;
+  lastSent: string;
 }
 
 export const IntakeDashboard = ({ onLogout }: IntakeDashboardProps) => {
@@ -17,12 +20,13 @@ export const IntakeDashboard = ({ onLogout }: IntakeDashboardProps) => {
   const [success, setSuccess] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
+  const [notes, setNotes] = useState<{ [key: number]: string }>({});
   const API_HOST = import.meta.env.VITE_API_HOST;
 
   const clients: Client[] = [
-    { id: 1, name: 'Sahil Chandel', mobile: '+91 7018763780' },
-    { id: 2, name: 'Akbar Khan', mobile: '+91 9898646434' },
-    { id: 3, name: 'Shikhar Gupta', mobile: '+91 8957566790' },
+    { id: 1, name: 'Sahil Chandel', mobile: '+91 7018763780', email: 'sahil@example.com', status: 'Pending', lastSent: '2023-10-01' },
+    { id: 2, name: 'Akbar Khan', mobile: '+91 9670867797', email: 'akbar@example.com', status: 'Completed', lastSent: '2023-09-28' },
+    { id: 3, name: 'Shikhar Gupta', mobile: '+91 8957566790', email: 'shikhar@example.com', status: 'Pending', lastSent: '2023-10-02' },
   ];
 
   const handleSendMagicLink = async (client: Client, e: React.MouseEvent) => {
@@ -34,6 +38,7 @@ export const IntakeDashboard = ({ onLogout }: IntakeDashboardProps) => {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append("bypass-tunnel-reminder", "true");
+    const encodedName = encodeURIComponent(client.name);
 
     try {
       const response = await fetch(`${API_HOST}/api/documents/send-message`, {
@@ -41,7 +46,7 @@ export const IntakeDashboard = ({ onLogout }: IntakeDashboardProps) => {
         headers: myHeaders,
         body: JSON.stringify({
           to: client.mobile.replace(/\D/g, ''),
-          message: `Hey ${client.name}👋, Please upload file in this link : https://trajector-hackathon.vercel.app/upload?name=${client.name}&phone=${client.mobile.replace(/\D/g, '')}`,
+          message: `Hey ${client.name}👋, Please upload file in this link : https://trajector-hackathon.vercel.app/upload?name=${encodedName}&phone=${client.mobile.replace(/\D/g, '')}`,
         }),
       });
 
@@ -58,6 +63,10 @@ export const IntakeDashboard = ({ onLogout }: IntakeDashboardProps) => {
 
   const toggleRow = (clientId: number) => {
     setExpandedRow(expandedRow === clientId ? null : clientId);
+  };
+
+  const handleNotesChange = (clientId: number, value: string) => {
+    setNotes({ ...notes, [clientId]: value });
   };
 
   return (
@@ -90,9 +99,11 @@ export const IntakeDashboard = ({ onLogout }: IntakeDashboardProps) => {
             <table className="client-table">
               <thead>
                 <tr>
-                  <th className="w-12"></th>
+                  <th className="w-8"></th>
                   <th>Name</th>
                   <th>Mobile</th>
+                  <th>Email</th>
+                  <th>Notes</th>
                   <th className="text-right">Actions</th>
                 </tr>
               </thead>
@@ -114,6 +125,17 @@ export const IntakeDashboard = ({ onLogout }: IntakeDashboardProps) => {
                         <Phone className="h-4 w-4" />
                         <span>{client.mobile}</span>
                       </td>
+                      <td>{client.email}</td>
+                      <td>
+                        <input
+                          type="text"
+                          value={notes[client.id] || ''}
+                          onChange={(e) => handleNotesChange(client.id, e.target.value)}
+                          onClick={(e) => e.stopPropagation()}
+                          placeholder="Add notes..."
+                          className="notes-input"
+                        />
+                      </td>
                       <td className="text-right">
                         <button
                           onClick={(e) => handleSendMagicLink(client, e)}
@@ -128,7 +150,7 @@ export const IntakeDashboard = ({ onLogout }: IntakeDashboardProps) => {
                           ) : (
                             <>
                               <Send className="h-4 w-4" />
-                              <span>Send Magic Link</span>
+                              <span>Send Link</span>
                             </>
                           )}
                         </button>
@@ -136,7 +158,7 @@ export const IntakeDashboard = ({ onLogout }: IntakeDashboardProps) => {
                     </tr>
                     {expandedRow === client.id && (
                       <tr className="expanded-content">
-                        <td colSpan={4}>
+                        <td colSpan={8}>
                           <div className="expanded-details">
                             <h4>Additional Information</h4>
                             <p>Click the button to send a WhatsApp message with the document upload link.</p>
