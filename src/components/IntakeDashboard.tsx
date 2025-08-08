@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Header } from '@/components/Header';
-import { Send, Phone, ChevronDown, ChevronRight } from 'lucide-react';
+import { Send, Phone, ChevronRight } from 'lucide-react';
 
 interface IntakeDashboardProps {
   onLogout: () => void;
@@ -19,7 +19,6 @@ export const IntakeDashboard = ({ onLogout }: IntakeDashboardProps) => {
   const [loading, setLoading] = useState<number | null>(null);
   const [success, setSuccess] = useState<string>('');
   const [error, setError] = useState<string>('');
-  const [expandedRow, setExpandedRow] = useState<number | null>(null);
   const [notes, setNotes] = useState<{ [key: number]: string }>({});
   const API_HOST = import.meta.env.VITE_API_HOST;
 
@@ -107,13 +106,10 @@ export const IntakeDashboard = ({ onLogout }: IntakeDashboardProps) => {
                 {clients.map((client) => (
                   <React.Fragment key={client.id}>
                     <tr 
-                      className={`client-row ${expandedRow === client.id ? 'expanded' : ''}`}
+                      className={`client-row`}
                     >
                       <td>
-                        {expandedRow === client.id ? 
-                          <ChevronDown className="w-4 h-4" /> : 
                           <ChevronRight className="w-4 h-4" />
-                        }
                       </td>
                       <td className="font-medium">{client.name}</td>
                       <td className="client-mobile" style={{height: "66px"}}>
@@ -151,16 +147,6 @@ export const IntakeDashboard = ({ onLogout }: IntakeDashboardProps) => {
                         </button>
                       </td>
                     </tr>
-                    {expandedRow === client.id && (
-                      <tr className="expanded-content">
-                        <td colSpan={8}>
-                          <div className="expanded-details">
-                            <h4>Additional Information</h4>
-                            <p>Click the button to send a WhatsApp message with the document upload link.</p>
-                          </div>
-                        </td>
-                      </tr>
-                    )}
                   </React.Fragment>
                 ))}
               </tbody>
