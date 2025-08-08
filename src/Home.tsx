@@ -37,12 +37,6 @@ const Home = () => {
     navigate('/login');
   };
 
-  const handleFileSubmit = (files: File[]) => {
-    console.log('Files to upload:', files);
-    toast(
-      `${files.length} ${files.length === 1 ? 'document' : 'documents'} uploaded to Trajector.`,);
-  };
-
   return (
     <>
       <Routes>

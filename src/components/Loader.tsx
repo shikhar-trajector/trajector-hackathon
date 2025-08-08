@@ -1,8 +1,5 @@
 
-import React, { useMemo } from 'react'
-
-
-type Appearance = 'brand' | 'simple';
+import { useMemo } from 'react'
 
 type Size = 'sm' | 'lg' | number;
 

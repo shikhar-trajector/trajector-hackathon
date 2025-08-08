@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { FileText } from 'lucide-react';
 
 interface LoginProps {
   onLogin: (email: string, role: 'intake' | 'client') => void;

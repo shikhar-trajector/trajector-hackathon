@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { FileText, LogOut } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 
 interface HeaderProps {
   onLogout?: () => void;

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Header } from '@/components/Header';
-import { Mail, Link, FileUp, Users, Send, Phone, ChevronDown, ChevronRight } from 'lucide-react';
+import { Send, Phone, ChevronDown, ChevronRight } from 'lucide-react';
 
 interface IntakeDashboardProps {
   onLogout: () => void;
