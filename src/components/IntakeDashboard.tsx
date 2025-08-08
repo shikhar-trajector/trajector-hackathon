@@ -41,7 +41,7 @@ export const IntakeDashboard = ({ onLogout }: IntakeDashboardProps) => {
         headers: myHeaders,
         body: JSON.stringify({
           to: client.mobile.replace(/\D/g, ''),
-          message: 'Hey 👋, Please upload file in this link : https://trajector-hackathon.vercel.app/upload',
+          message: `Hey ${client.name}👋, Please upload file in this link : https://trajector-hackathon.vercel.app/upload?name=${client.name}&phone=${client.mobile.replace(/\D/g, '')}`,
         }),
       });
 
