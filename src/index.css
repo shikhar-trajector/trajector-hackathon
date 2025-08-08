@@ -1208,15 +1208,6 @@ body {
   gap: var(--spacing-2);
 }
 
-.loading-spinner {
-  width: 16px;
-  height: 16px;
-  border: 2px solid var(--primary-foreground);
-  border-top-color: transparent;
-  border-radius: 50%;
-  animation: spinner 0.6s linear infinite;
-}
-
 .client-alert {
   padding: var(--spacing-4);
   border-radius: var(--radius-lg);

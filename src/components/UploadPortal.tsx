@@ -1,13 +1,16 @@
 import { Header } from './Header'
 import { FileUpload } from './FileUpload'
 import { toast } from "sonner"
+import { useState } from 'react';
 
 const UploadPortal = () => {
+    const [loading, setLoading] = useState(false);
     const urlParams = new URLSearchParams(window.location.search);
     const name = urlParams.get('name') || 'Akbar';
     const phone = urlParams.get('phone') || '919670867797';
     const API_HOST = import.meta.env.VITE_API_HOST;
     const handleFileSubmit = async (files: File[]) => {
+      setLoading(true);
       const formData = new FormData();
       files.forEach((file) => {
         formData.append('file', file);
@@ -32,9 +35,11 @@ const UploadPortal = () => {
         } else {
           toast('Upload failed. Please try again.');
         }
+        setLoading(false);
       } catch (error) {
         toast('An error occurred during upload.');
         console.error(error);
+        setLoading(false);
       }
     };
   
@@ -54,7 +59,7 @@ const UploadPortal = () => {
                     </p>
                   </div>
                   
-                  <FileUpload onSubmit={handleFileSubmit} />
+                  <FileUpload onSubmit={handleFileSubmit} loading={loading}/>
                 </div>
               </main>
             </div>

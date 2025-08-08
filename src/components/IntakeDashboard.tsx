@@ -61,10 +61,6 @@ export const IntakeDashboard = ({ onLogout }: IntakeDashboardProps) => {
     }
   };
 
-  const toggleRow = (clientId: number) => {
-    setExpandedRow(expandedRow === clientId ? null : clientId);
-  };
-
   const handleNotesChange = (clientId: number, value: string) => {
     setNotes({ ...notes, [clientId]: value });
   };
@@ -112,7 +108,6 @@ export const IntakeDashboard = ({ onLogout }: IntakeDashboardProps) => {
                   <React.Fragment key={client.id}>
                     <tr 
                       className={`client-row ${expandedRow === client.id ? 'expanded' : ''}`}
-                      onClick={() => toggleRow(client.id)}
                     >
                       <td>
                         {expandedRow === client.id ? 
@@ -121,7 +116,7 @@ export const IntakeDashboard = ({ onLogout }: IntakeDashboardProps) => {
                         }
                       </td>
                       <td className="font-medium">{client.name}</td>
-                      <td className="client-mobile">
+                      <td className="client-mobile" style={{height: "66px"}}>
                         <Phone className="h-4 w-4" />
                         <span>{client.mobile}</span>
                       </td>

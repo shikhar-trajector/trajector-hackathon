@@ -4,9 +4,10 @@ import { Upload, File, X } from 'lucide-react';
 interface FileUploadProps {
   onSubmit: (files: File[]) => void;
   className?: string;
+  loading?: boolean;
 }
 
-export const FileUpload: React.FC<FileUploadProps> = ({ onSubmit, className }) => {
+export const FileUpload: React.FC<FileUploadProps> = ({ onSubmit, className, loading }) => {
   const [dragActive, setDragActive] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -138,17 +139,18 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onSubmit, className }) =
       )}
 
       {/* Submit Button */}
-      {files.length > 0 && (
+      {(files.length > 0 || loading) ? (
         <div className="flex justify-center">
           <button
             onClick={handleSubmit}
             className="trajector-button trajector-button-primary trajector-button-lg bg-gradient-primary hover-scale shadow-elegant"
             style={{ minWidth: '12rem' }}
+            disabled={loading}
           >
-            Upload {files.length} {files.length === 1 ? 'Document' : 'Documents'}
+            {loading ? "Uploading files..." : `Upload ${files.length} ${files.length === 1 ? 'Document' : 'Documents'}`}
           </button>
         </div>
-      )}
+      ) : null}
     </div>
   );
 };
