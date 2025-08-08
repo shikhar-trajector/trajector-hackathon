@@ -18,7 +18,7 @@ export const Login = ({ onLogin }: LoginProps) => {
     }
 
     // Simple role detection based on email
-    const role = email === 'intake@email' ? 'intake' : 'client';
+    const role = email.toLowerCase().includes('intake') ? 'intake' : 'client';
     
     // Store in localStorage for prototype
     localStorage.setItem('trajector_user', JSON.stringify({ email, role }));
