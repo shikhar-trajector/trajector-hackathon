@@ -1,175 +1,153 @@
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Textarea } from '@/components/ui/textarea';
 import { Header } from '@/components/Header';
-import { toast } from "sonner"
-import { Mail, Link, FileUp, Users } from 'lucide-react';
+import { Mail, Link, FileUp, Users, Send, Phone, ChevronDown, ChevronRight } from 'lucide-react';
 
 interface IntakeDashboardProps {
   onLogout: () => void;
 }
 
+interface Client {
+  id: number;
+  name: string;
+  mobile: string;
+}
+
 export const IntakeDashboard = ({ onLogout }: IntakeDashboardProps) => {
-  const [clientEmail, setClientEmail] = useState('');
-  const [uploadMethod, setUploadMethod] = useState('');
-  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState<number | null>(null);
+  const [success, setSuccess] = useState<string>('');
+  const [error, setError] = useState<string>('');
+  const [expandedRow, setExpandedRow] = useState<number | null>(null);
+  const API_HOST = import.meta.env.VITE_API_HOST;
 
-  const handleSendRequest = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!clientEmail || !uploadMethod) {
-        toast("Please fill in all required fields")
-    //   toast({
-    //     title: "Error",
-    //     description: "Please fill in all required fields",
-    //     variant: "destructive",
-    //   });
-      return;
+  const clients: Client[] = [
+    { id: 1, name: 'Sahil Chandel', mobile: '+91 7018763780' },
+    { id: 2, name: 'Akbar Khan', mobile: '+91 9898646434' },
+    { id: 3, name: 'Shikhar Gupta', mobile: '+91 8957566790' },
+  ];
+
+  const handleSendMagicLink = async (client: Client, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent row expansion when clicking the button
+    setLoading(client.id);
+    setSuccess('');
+    setError('');
+
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("bypass-tunnel-reminder", "true");
+
+    try {
+      const response = await fetch(`${API_HOST}/api/documents/send-message`, {
+        method: 'POST',
+        headers: myHeaders,
+        body: JSON.stringify({
+          to: client.mobile.replace(/\D/g, ''),
+          message: 'Hey 👋, Please upload file in this link : https://trajector-hackathon.vercel.app/upload',
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to send WhatsApp message');
+
+      setSuccess(`Successfully sent magic link to ${client.name}`);
+    } catch (err) {
+      console.error(err);
+      setError(`Failed to send magic link to ${client.name}`);
+    } finally {
+      setLoading(null);
     }
+  };
 
-    // Simulate sending request
-    const method = uploadMethod === 'email' ? 'email reply' : 'magic link';
-    
-    // toast({
-    //   title: "Upload request sent!",
-    //   description: `Sent ${method} request to ${clientEmail}`,
-    // });
-    toast(`Upload request sent! Sent ${method} request to ${clientEmail}`);
-
-    // Reset form
-    setClientEmail('');
-    setUploadMethod('');
-    setMessage('');
+  const toggleRow = (clientId: number) => {
+    setExpandedRow(expandedRow === clientId ? null : clientId);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
+    <div className="min-h-screen bg-gradient">
       <Header onLogout={onLogout} userRole="intake" />
-      
-      <main className="container mx-auto px-6 py-12">
+      <main className="container py-12">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-foreground mb-4">
-              Intake Representative Dashboard
+              Client Directory
             </h2>
             <p className="text-xl text-muted-foreground">
-              Request documents from clients via email or magic link
+              Send document upload requests to clients via WhatsApp magic link
             </p>
           </div>
 
-          <div className="grid gap-8 md:grid-cols-2">
-            {/* Send Upload Request */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileUp className="h-5 w-5" />
-                  Request Client Upload
-                </CardTitle>
-                <CardDescription>
-                  Send upload request to a client
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSendRequest} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="clientEmail">Client Email</Label>
-                    <Input
-                      id="clientEmail"
-                      type="email"
-                      placeholder="client@example.com"
-                      value={clientEmail}
-                      onChange={(e) => setClientEmail(e.target.value)}
-                      required
-                    />
-                  </div>
+          {success && (
+            <div className="client-alert success mb-6">
+              <p>{success}</p>
+            </div>
+          )}
 
-                  <div className="space-y-3">
-                    <Label>Upload Method</Label>
-                    <RadioGroup value={uploadMethod} onValueChange={setUploadMethod}>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="email" id="email" />
-                        <Label htmlFor="email" className="flex items-center gap-2 cursor-pointer">
-                          <Mail className="h-4 w-4" />
-                          Email Reply Upload
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="magic-link" id="magic-link" />
-                        <Label htmlFor="magic-link" className="flex items-center gap-2 cursor-pointer">
-                          <Link className="h-4 w-4" />
-                          Magic Link Upload
-                        </Label>
-                      </div>
-                    </RadioGroup>
-                  </div>
+          {error && (
+            <div className="client-alert error mb-6">
+              <p>{error}</p>
+            </div>
+          )}
 
-                  <div className="space-y-2">
-                    <Label htmlFor="message">Additional Message (Optional)</Label>
-                    <Textarea
-                      id="message"
-                      placeholder="Please upload your tax documents for 2024..."
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      rows={3}
-                    />
-                  </div>
-
-                  <Button type="submit" className="w-full">
-                    Send Upload Request
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-
-            {/* Recent Requests */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5" />
-                  Recent Requests
-                </CardTitle>
-                <CardDescription>
-                  Track sent upload requests
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="p-3 border rounded-lg">
-                    <div className="flex justify-between items-start mb-2">
-                      <p className="font-medium text-sm">john@example.com</p>
-                      <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
-                        Pending
-                      </span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">Magic Link • 2 hours ago</p>
-                  </div>
-                  
-                  <div className="p-3 border rounded-lg">
-                    <div className="flex justify-between items-start mb-2">
-                      <p className="font-medium text-sm">mary@example.com</p>
-                      <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
-                        Completed
-                      </span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">Email Reply • 1 day ago</p>
-                  </div>
-                  
-                  <div className="p-3 border rounded-lg">
-                    <div className="flex justify-between items-start mb-2">
-                      <p className="font-medium text-sm">bob@example.com</p>
-                      <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
-                        Completed
-                      </span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">Magic Link • 3 days ago</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          <div className="client-table-container">
+            <table className="client-table">
+              <thead>
+                <tr>
+                  <th className="w-12"></th>
+                  <th>Name</th>
+                  <th>Mobile</th>
+                  <th className="text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {clients.map((client) => (
+                  <React.Fragment key={client.id}>
+                    <tr 
+                      className={`client-row ${expandedRow === client.id ? 'expanded' : ''}`}
+                      onClick={() => toggleRow(client.id)}
+                    >
+                      <td>
+                        {expandedRow === client.id ? 
+                          <ChevronDown className="w-4 h-4" /> : 
+                          <ChevronRight className="w-4 h-4" />
+                        }
+                      </td>
+                      <td className="font-medium">{client.name}</td>
+                      <td className="client-mobile">
+                        <Phone className="h-4 w-4" />
+                        <span>{client.mobile}</span>
+                      </td>
+                      <td className="text-right">
+                        <button
+                          onClick={(e) => handleSendMagicLink(client, e)}
+                          className="client-action-button-sm"
+                          disabled={loading === client.id}
+                        >
+                          {loading === client.id ? (
+                            <div className="button-loading">
+                              <div className="loading-spinner" />
+                              <span>Sending...</span>
+                            </div>
+                          ) : (
+                            <>
+                              <Send className="h-4 w-4" />
+                              <span>Send Magic Link</span>
+                            </>
+                          )}
+                        </button>
+                      </td>
+                    </tr>
+                    {expandedRow === client.id && (
+                      <tr className="expanded-content">
+                        <td colSpan={4}>
+                          <div className="expanded-details">
+                            <h4>Additional Information</h4>
+                            <p>Click the button to send a WhatsApp message with the document upload link.</p>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </main>

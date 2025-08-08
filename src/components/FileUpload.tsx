@@ -1,7 +1,5 @@
 import React, { useState, useRef } from 'react';
 import { Upload, File, X } from 'lucide-react';
-import { Button } from './ui/button';
-import { cn } from '@/lib/utils';
 
 interface FileUploadProps {
   onSubmit: (files: File[]) => void;
@@ -65,16 +63,10 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onSubmit, className }) =
   };
 
   return (
-    <div className={cn('w-full max-w-2xl mx-auto space-y-6', className)}>
+    <div className={`w-full max-w-2xl mx-auto space-y-6 ${className || ''}`}>
       {/* Upload Zone */}
       <div
-        className={cn(
-          'relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300',
-          'bg-[hsl(var(--upload-bg))] hover:bg-[hsl(var(--upload-hover))]',
-          'border-[hsl(var(--upload-border))] hover:border-primary',
-          dragActive && 'border-primary bg-accent/50 scale-[1.02]',
-          'shadow-[var(--shadow-soft)] hover:shadow-[var(--shadow-elegant)]'
-        )}
+        className={`trajector-upload-zone hover-scale hover-shadow ${dragActive ? 'active' : ''}`}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
         onDragOver={handleDrag}
@@ -85,16 +77,12 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onSubmit, className }) =
           type="file"
           multiple
           onChange={handleChange}
-          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+          className="hidden-input"
           accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg,.gif,.zip,.rar"
         />
         
         <div className="flex flex-col items-center space-y-4">
-          <div className={cn(
-            'w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300',
-            'bg-gradient-to-br from-primary to-primary-glow',
-            dragActive && 'scale-110'
-          )}>
+          <div className={`w-16 h-16 rounded-full bg-gradient-primary flex items-center justify-center transition-all ${dragActive ? 'hover-scale' : ''}`}>
             <Upload className="w-8 h-8 text-primary-foreground" />
           </div>
           
@@ -107,9 +95,9 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onSubmit, className }) =
             </p>
           </div>
           
-          <Button variant="outline" size="sm" className="mt-4">
+          <button type="button" className="trajector-button trajector-button-outline trajector-button-sm mt-4">
             Browse Files
-          </Button>
+          </button>
         </div>
       </div>
 
@@ -121,10 +109,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onSubmit, className }) =
           </h4>
           <div className="space-y-2">
             {files.map((file, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between p-4 bg-card rounded-lg border shadow-sm"
-              >
+              <div key={index} className="trajector-file-item">
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
                     <File className="w-5 h-5 text-muted-foreground" />
@@ -139,14 +124,13 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onSubmit, className }) =
                   </div>
                 </div>
                 
-                <Button
-                  variant="ghost"
-                  size="sm"
+                <button
+                  type="button"
                   onClick={() => removeFile(index)}
-                  className="text-muted-foreground hover:text-destructive"
+                  className="trajector-button trajector-button-outline trajector-button-sm text-muted-foreground hover:text-destructive"
                 >
                   <X className="w-4 h-4" />
-                </Button>
+                </button>
               </div>
             ))}
           </div>
@@ -156,13 +140,13 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onSubmit, className }) =
       {/* Submit Button */}
       {files.length > 0 && (
         <div className="flex justify-center">
-          <Button
+          <button
             onClick={handleSubmit}
-            size="lg"
-            className="min-w-48 bg-gradient-to-r from-primary to-primary-glow hover:from-primary-glow hover:to-primary transition-all duration-300 shadow-[var(--shadow-elegant)] hover:shadow-lg hover:scale-105"
+            className="trajector-button trajector-button-primary trajector-button-lg bg-gradient-primary hover-scale shadow-elegant"
+            style={{ minWidth: '12rem' }}
           >
             Upload {files.length} {files.length === 1 ? 'Document' : 'Documents'}
-          </Button>
+          </button>
         </div>
       )}
     </div>

@@ -1,20 +1,21 @@
 import { useState, useEffect } from 'react';
-import { Header } from '@/components/Header';
-import { FileUpload } from '@/components/FileUpload';
+import { useNavigate, Routes, Route } from 'react-router-dom';
 import { Login } from '@/components/Login';
 import { IntakeDashboard } from '@/components/IntakeDashboard';
+import { ClientPortal } from '@/components/ClientPortal';
 import { toast } from "sonner"
+import UploadPortal from './components/UploadPortal';
 
 interface User {
   email: string;
   role: 'intake' | 'client';
 }
 
-const Index = () => {
+const Home = () => {
   const [user, setUser] = useState<User | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user is already logged in
     const savedUser = localStorage.getItem('trajector_user');
     if (savedUser) {
       setUser(JSON.parse(savedUser));
@@ -22,62 +23,76 @@ const Index = () => {
   }, []);
 
   const handleLogin = (email: string, role: 'intake' | 'client') => {
-    setUser({ email, role });
+    const userObj = { email, role };
+    setUser(userObj);
+    localStorage.setItem('trajector_user', JSON.stringify(userObj));
+    toast(`Welcome ${role === 'intake' ? 'Intake Representative' : 'Client'}!`);
+    navigate(role === 'intake' ? '/admin' : '/client');
   };
 
   const handleLogout = () => {
     localStorage.removeItem('trajector_user');
     setUser(null);
-    // toast({
-    //   title: "Logged out",
-    //   description: "You have been successfully logged out.",
-    // });
-    toast("Logged out");
+    toast('You have been successfully logged out.');
+    navigate('/login');
   };
 
   const handleFileSubmit = (files: File[]) => {
-    // Here you would typically upload files to your backend
     console.log('Files to upload:', files);
-    
-    // toast({
-    //   title: "Files uploaded successfully!",
-    //   description: `${files.length} ${files.length === 1 ? 'document' : 'documents'} uploaded to Trajector.`,
-    // });
-    toast(`Files uploaded successfully! ${files.length} ${files.length === 1 ? 'document' : 'documents'} uploaded to Trajector.`);
+    toast(
+      `${files.length} ${files.length === 1 ? 'document' : 'documents'} uploaded to Trajector.`,);
   };
 
-  // Show login if no user
-  if (!user) {
-    return <Login onLogin={handleLogin} />;
-  }
-
-  // Show intake dashboard for intake role
-  if (user.role === 'intake') {
-    return <IntakeDashboard onLogout={handleLogout} />;
-  }
-
-  // Show client upload interface
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
-      <Header onLogout={handleLogout} userRole="client" />
-      
-      <main className="container mx-auto px-6 py-12">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-foreground mb-4">
-              Upload Your Documents
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Securely store and manage your documents in one centralized location. 
-              Drag and drop files or browse to get started.
-            </p>
-          </div>
-          
-          <FileUpload onSubmit={handleFileSubmit} />
-        </div>
-      </main>
-    </div>
+    <>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            user ? (
+              user.role === 'intake' ? (
+                <IntakeDashboard onLogout={handleLogout} />
+              ) : (
+                <ClientPortal onLogout={handleLogout} />
+              )
+            ) : (
+              <Login onLogin={handleLogin} />
+            )
+          }
+        />
+        <Route
+          path="/login"
+          element={<Login onLogin={handleLogin} />}
+        />
+        <Route
+          path="/admin"
+          element={
+            user && user.role === 'intake' ? (
+              <IntakeDashboard onLogout={handleLogout} />
+            ) : (
+              <Login onLogin={handleLogin} />
+            )
+          }
+        />
+        <Route
+          path="/client"
+          element={
+            user && user.role === 'client' ? (
+              <ClientPortal onLogout={handleLogout} />
+            ) : (
+              <Login onLogin={handleLogin} />
+            )
+          }
+        />
+        <Route
+          path="/upload"
+          element={
+              <UploadPortal />
+          }
+        />
+      </Routes>
+    </>
   );
 };
 
-export default Index;
+export default Home;
