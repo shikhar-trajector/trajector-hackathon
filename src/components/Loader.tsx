@@ -93,7 +93,7 @@ const Loader = () => {
           strokeLinecap="round"
         />
       </svg>
-      <img
+      {/* <img
         src="/TJ_mob_logo.svg"
         alt="Trajector logo"
         width={40}
@@ -101,7 +101,7 @@ const Loader = () => {
         role="presentation"
         className={`absolute top-1/2 -translate-x-1/2 -translate-y-1/2 ${isLogoVisible ? 'opacity-100' : 'opacity-100'}`}
         style={{left: "29%"}}
-      />
+      /> */}
     </div>
       </div>
     </div>

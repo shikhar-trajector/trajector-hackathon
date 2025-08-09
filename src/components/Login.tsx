@@ -33,7 +33,7 @@ export const Login = ({ onLogin }: LoginProps) => {
       <div className="trajector-card w-full max-w-md">
         {/* Header */}
         <div className="text-center p-8 pb-6" style={{paddingBottom: '0'}}>
-          <img src="/TJ_desk_logo.svg" alt="Trajector Logo" style={{height: "60px"}} />
+          {/* <img src="/TJ_desk_logo.svg" alt="Trajector Logo" style={{height: "60px"}} /> */}
           <h2 >
             Sign in to your account
           </h2>
